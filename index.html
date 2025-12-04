@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuickBites — Order Snacks</title>
+  <title>POP 'N CRUNCH</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { theme: { extend: {} } }
@@ -12,55 +12,55 @@
     import React, { useState } from 'https://esm.sh/react@18.2.0';
     import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
+    // Menu Items
     const menu = [
       {
-        id: 99,
-        name: 'Combo Meal',
-        price: 99,
-        description: 'Crinkle fries + crispy chicken popcorn + ketchup.',
-        img: 'combo.jpeg'
-      },
-      {
         id: 1,
-        name: 'Fries - Regular',
+        name: 'Regular Fries',
         price: 35,
         description: 'Crispy golden fries.',
-        img: 'https://via.placeholder.com/150?text=Fries'
+        img: 'https://via.placeholder.com/80?text=F',
+        category: 'fries'
       },
       {
         id: 2,
-        name: 'Fries - Large',
+        name: 'Large Fries',
         price: 45,
         description: 'Extra-large serving.',
-        img: 'https://via.placeholder.com/150?text=Fries+Large'
+        img: 'https://via.placeholder.com/80?text=L',
+        category: 'fries'
       },
       {
         id: 3,
-        name: 'Fruit Soda - Green Apple',
+        name: 'Fruit Soda - Strawberry',
         price: 25,
-        description: 'Refreshing green apple soda.',
-        img: 'greenapple.jpeg'
+        description: 'Sweet strawberry flavor.',
+        img: 'strawberry.jpeg',
+        category: 'soda'
       },
       {
         id: 4,
-        name: 'Fruit Soda - Strawberry',
+        name: 'Fruit Soda - Blueberry',
         price: 25,
-        description: 'Sweet strawberry soda.',
-        img: 'strawberry.jpeg'
+        description: 'Tangy blueberry taste.',
+        img: 'blueberry.jpeg',
+        category: 'soda'
       },
       {
         id: 5,
-        name: 'Fruit Soda - Blueberry',
+        name: 'Fruit Soda - Green Apple',
         price: 25,
-        description: 'Tangy blueberry soda.',
-        img: 'blueberry.jpeg'
+        description: 'Refreshing green apple.',
+        img: 'greenapple.jpeg',
+        category: 'soda'
       },
       {
         id: 6,
         name: 'Add-on: Nata de Coco',
         price: 10,
-        description: 'Chewy topping for your soda.',
-        img: 'https://via.placeholder.com/150?text=Nata+de+Coco'
+        description: 'Chewy topping for soda.',
+        img: 'https://via.placeholder.com/80?text=N',
+        category: 'addon'
       },
     ];
 
@@ -102,15 +102,15 @@
 
       return React.createElement(
         'div',
-        { className: 'min-h-screen bg-gray-50' },
+        { className: 'min-h-screen bg-white' },
         // Header
         React.createElement(
           'header',
-          { className: 'bg-indigo-600 text-white shadow' },
+          { className: 'bg-red-600 text-white shadow' },
           React.createElement(
             'div',
             { className: 'max-w-4xl mx-auto px-4 py-4 flex justify-between items-center' },
-            React.createElement('h1', { className: 'text-2xl font-bold' }, 'QuickBites'),
+            React.createElement('h1', { className: 'text-2xl font-bold' }, 'POP \'N CRUNCH'),
             React.createElement(
               'button',
               {
@@ -122,7 +122,7 @@
                 React.createElement(
                   'span',
                   {
-                    className: 'absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'
+                    className: 'absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'
                   },
                   itemCount
                 )
@@ -130,68 +130,130 @@
           )
         ),
 
-        // Hero Combo Section
-        React.createElement(
-          'section',
-          { className: 'max-w-4xl mx-auto px-4 py-8' },
-          React.createElement(
-            'div',
-            { className: 'bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl shadow-md text-center' },
-            React.createElement(
-              'img',
-              {
-                src: 'combo.jpeg',
-                alt: 'Fries + Chicken Popcorn Combo',
-                className: 'mx-auto w-full max-w-md rounded-lg shadow mb-4'
-              }
-            ),
-            React.createElement('h2', { className: 'text-2xl font-bold mb-2' }, '🔥 Best-Seller Combo'),
-            React.createElement('p', { className: 'text-gray-700 mb-4' }, 'Crinkle fries + crispy chicken popcorn + ketchup — only ₱99!'),
-            React.createElement(
-              'button',
-              {
-                onClick: () => addToCart(menu.find(item => item.id === 99)),
-                className: 'py-2 px-6 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-medium'
-              },
-              'Add Combo to Order'
-            )
-          )
-        ),
-
-        // Menu Section
+        // Main Menu
         React.createElement(
           'main',
           { className: 'max-w-4xl mx-auto px-4 py-8' },
-          React.createElement('h2', { className: 'text-2xl font-bold mb-4' }, 'Order Your Snacks'),
-          React.createElement('p', { className: 'text-gray-600 mb-6' }, 'Delivery fee: ₱10–15 (based on location)'),
+          // Fries Section
           React.createElement(
-            'div',
-            { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' },
-            menu.map(item =>
-              React.createElement(
-                'div',
-                { key: item.id, className: 'bg-white rounded-lg shadow overflow-hidden border-l-4 border-indigo-500' },
+            'section',
+            { className: 'mb-8' },
+            React.createElement('h2', { className: 'text-xl font-bold mb-4 text-red-600 border-b pb-2' }, 'FRIES'),
+            React.createElement(
+              'div',
+              { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
+              menu.filter(item => item.category === 'fries').map(item =>
                 React.createElement(
-                  'img',
-                  {
-                    src: item.img,
-                    alt: item.name,
-                    className: 'w-full h-32 object-cover'
-                  }
-                ),
-                React.createElement('h3', { className: 'font-bold text-lg p-3' }, item.name),
-                React.createElement('p', { className: 'text-gray-600 text-sm px-3 pb-2' }, item.description),
-                React.createElement('p', { className: 'px-3 pb-3 font-semibold text-indigo-600' }, `₱${item.price}`),
-                React.createElement(
-                  'button',
-                  {
-                    onClick: () => addToCart(item),
-                    className: 'w-full py-2 bg-indigo-600 text-white rounded-b hover:bg-indigo-700'
-                  },
-                  'Add to Order'
+                  'div',
+                  { key: item.id, className: 'flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow' },
+                  React.createElement(
+                    'div',
+                    { className: 'flex items-center space-x-3' },
+                    React.createElement(
+                      'img',
+                      {
+                        src: item.img,
+                        alt: item.name,
+                        className: 'w-10 h-10 object-contain'
+                      }
+                    ),
+                    React.createElement('span', { className: 'font-medium' }, item.name)
+                  ),
+                  React.createElement(
+                    'div',
+                    { className: 'flex items-center space-x-2' },
+                    React.createElement('span', { className: 'font-bold text-indigo-600' }, `₱${item.price}`),
+                    React.createElement(
+                      'button',
+                      {
+                        onClick: () => addToCart(item),
+                        className: 'ml-2 py-1 px-3 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700'
+                      },
+                      '+'
+                    )
+                  )
                 )
               )
             )
+          ),
+
+          // Fruit Soda Section
+          React.createElement(
+            'section',
+            { className: 'mb-8' },
+            React.createElement('h2', { className: 'text-xl font-bold mb-4 text-blue-600 border-b pb-2' }, 'FRUIT SODA'),
+            React.createElement(
+              'div',
+              { className: 'grid grid-cols-1 md:grid-cols-3 gap-4' },
+              menu.filter(item => item.category === 'soda').map(item =>
+                React.createElement(
+                  'div',
+                  { key: item.id, className: 'flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow text-center' },
+                  React.createElement(
+                    'img',
+                    {
+                      src: item.img,
+                      alt: item.name,
+                      className: 'w-16 h-16 object-contain mb-2'
+                    }
+                  ),
+                  React.createElement('span', { className: 'font-medium text-sm' }, item.name.split(' - ')[1]),
+                  React.createElement('span', { className: 'font-bold text-indigo-600 mt-2' }, `₱${item.price}`),
+                  React.createElement(
+                    'button',
+                    {
+                      onClick: () => addToCart(item),
+                      className: 'mt-2 py-1 px-3 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700'
+                    },
+                    '+'
+                  )
+                )
+              )
+            )
+          ),
+
+          // Add-ons Section
+          React.createElement(
+            'section',
+            { className: 'mb-8' },
+            React.createElement('h2', { className: 'text-xl font-bold mb-4 text-green-600 border-b pb-2' }, 'ADD-ONS'),
+            React.createElement(
+              'div',
+              { className: 'flex items-center justify-between bg-gray-50 p-4 rounded-lg shadow' },
+              React.createElement(
+                'div',
+                { className: 'flex items-center space-x-3' },
+                React.createElement(
+                  'img',
+                  {
+                    src: menu.find(item => item.id === 6)?.img,
+                    alt: 'Nata de Coco',
+                    className: 'w-10 h-10 object-contain'
+                  }
+                ),
+                React.createElement('span', { className: 'font-medium' }, 'Nata de Coco')
+              ),
+              React.createElement(
+                'div',
+                { className: 'flex items-center space-x-2' },
+                React.createElement('span', { className: 'font-bold text-indigo-600' }, `₱10`),
+                React.createElement(
+                  'button',
+                  {
+                    onClick: () => addToCart(menu.find(item => item.id === 6)),
+                    className: 'ml-2 py-1 px-3 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700'
+                  },
+                  '+'
+                )
+              )
+            )
+          ),
+
+          // Delivery Note
+          React.createElement(
+            'p',
+            { className: 'text-gray-600 text-center mt-6' },
+            'Delivery fee: ₱10–15 (based on location)'
           )
         ),
 
@@ -283,7 +345,7 @@
         React.createElement(
           'footer',
           { className: 'text-center py-6 text-gray-600 text-sm' },
-          `© ${new Date().getFullYear()} QuickBites — Fresh snacks, fast delivery.`
+          `© ${new Date().getFullYear()} POP 'N CRUNCH — Fresh snacks, fast delivery.`
         )
       );
     }
@@ -291,7 +353,7 @@
     ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </head>
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen bg-white">
   <div id="root"></div>
 </body>
 </html>
