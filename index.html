@@ -11,8 +11,8 @@
         extend: {
           colors: {
             primary: '#4f46e5', // soft indigo
-            accent: '#f59e0b',  // warm amber for highlights
-            background: '#fdf9f3', // cream
+            accent: '#f59e0b',  // warm amber
+            background: '#fdf9f3',
             surface: '#fefefe',
             text: '#374151'
           }
@@ -55,11 +55,42 @@
       };
 
       const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const total = subtotal + 15;
+      const total = subtotal + 15; // est. delivery
       const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+      // ✅ Send to Messenger with pre-filled message
       const openGcashInstructions = () => {
-        alert("Please scan the GCash QR code below and include your order details in the reference note.");
+        if (cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+
+        const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
+
+        const encodedMessage = encodeURIComponent(message);
+        const messengerUrl = `https://m.me/61586479456909?text=${encodedMessage}`;
+
+        window.open(messengerUrl, '_blank');
+
+        // Optional: Clear cart after sending (uncomment if desired)
+        // setCart([]);
+        // setShowCart(false);
+      };
+
+      // ✅ Copy order to clipboard (fallback)
+      const copyOrderToClipboard = () => {
+        if (cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+
+        const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+        const fullMessage = `Hi! I'd like to place an order:\n${itemsText}\nTotal: ₱${total} (incl. delivery)\nI've paid via GCash. Please confirm!\n\nPage: https://www.facebook.com/profile.php?id=61586479456909`;
+
+        navigator.clipboard.writeText(fullMessage).then(() => {
+          alert('✅ Order copied! Please paste and send it to our Facebook page.');
+        });
       };
 
       return React.createElement(
@@ -261,7 +292,7 @@
                         React.createElement('span', null, `₱${total}`)
                       )
                     ),
-                    // GCash QR Section
+                    // GCash QR + Action Buttons
                     React.createElement(
                       'div',
                       { className: 'mt-6 text-center' },
@@ -272,13 +303,25 @@
                         className: 'w-32 h-32 mx-auto border rounded-lg bg-white p-1'
                       }),
                       React.createElement('p', { className: 'text-xs text-gray-500 mt-2' }, 'Scan to pay. Include your order in the reference.'),
+
+                      // Primary Button: Send via Messenger
                       React.createElement(
                         'button',
                         {
                           onClick: openGcashInstructions,
                           className: 'w-full mt-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition'
                         },
-                        'I’ve Paid via GCash'
+                        '✅ I’ve Paid – Send Order via Messenger'
+                      ),
+
+                      // Fallback: Copy Order
+                      React.createElement(
+                        'button',
+                        {
+                          onClick: copyOrderToClipboard,
+                          className: 'w-full mt-2 py-2 text-gray-600 border border-gray-300 rounded text-sm hover:bg-gray-50 transition'
+                        },
+                        '📋 Copy Order & Message Us'
                       )
                     )
                   )
@@ -289,7 +332,17 @@
         React.createElement(
           'footer',
           { className: 'text-center py-6 text-gray-500 text-xs' },
-          `© ${new Date().getFullYear()} pop ’n crunch — fresh snacks, fast delivery.`
+          `© ${new Date().getFullYear()} pop ’n crunch — fresh snacks, fast delivery. `,
+          React.createElement(
+            'a',
+            {
+              href: 'https://www.facebook.com/profile.php?id=61586479456909',
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              className: 'text-primary hover:underline ml-1'
+            },
+            'Message us on Facebook'
+          )
         )
       );
     }
