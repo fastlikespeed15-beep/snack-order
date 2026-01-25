@@ -66,7 +66,13 @@
         }
 
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
+        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. 
+
+Name:
+
+Address:
+
+Please confirm!`;
 
         const encodedMessage = encodeURIComponent(message);
         const messengerUrl = `https://m.me/61586479456909?text=${encodedMessage}`;
