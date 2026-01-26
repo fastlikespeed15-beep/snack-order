@@ -10,8 +10,8 @@
       theme: {
         extend: {
           colors: {
-            primary: '#4f46e5', // soft indigo
-            accent: '#f59e0b',  // warm amber
+            primary: '#4f46e5',
+            accent: '#f59e0b',
             background: '#fdf9f3',
             surface: '#fefefe',
             text: '#374151'
@@ -25,17 +25,20 @@
     import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
     const menu = [
-      { id: 1, name: 'Regular Fries', price: 35, description: 'Crispy golden fries.', img: 'regular.jpeg', category: 'fries' },
-      { id: 2, name: 'Large Fries', price: 45, description: 'Extra-large serving.', img: 'large.jpeg', category: 'fries' },
-      { id: 3, name: 'Fruit Soda - Strawberry', price: 25, description: 'Sweet strawberry flavor.', img: 'strawberry.jpeg', category: 'soda' },
-      { id: 4, name: 'Fruit Soda - Blueberry', price: 25, description: 'Tangy blueberry taste.', img: 'blueberry.jpeg', category: 'soda' },
-      { id: 5, name: 'Fruit Soda - Green Apple', price: 25, description: 'Refreshing green apple.', img: 'greenapple.jpeg', category: 'soda' },
-      { id: 6, name: 'Add-on: Nata de Coco', price: 10, description: 'Chewy topping for soda.', img: 'natadecoco.jpeg', category: 'addon' },
+      { id: 1, name: 'Regular Fries', price: 35, img: 'regular.jpeg', category: 'fries' },
+      { id: 2, name: 'Large Fries', price: 45, img: 'large.jpeg', category: 'fries' },
+      { id: 3, name: 'Fruit Soda - Strawberry', price: 25, img: 'strawberry.jpeg', category: 'soda' },
+      { id: 4, name: 'Fruit Soda - Blueberry', price: 25, img: 'blueberry.jpeg', category: 'soda' },
+      { id: 5, name: 'Fruit Soda - Green Apple', price: 25, img: 'greenapple.jpeg', category: 'soda' },
+      { id: 6, name: 'Add-on: Nata de Coco', price: 10, img: 'natadecoco.jpeg', category: 'addon' },
     ];
 
     function App() {
       const [cart, setCart] = useState([]);
       const [showCart, setShowCart] = useState(false);
+      const [showForm, setShowForm] = useState(false); // 👈 New state
+      const [name, setName] = useState('');
+      const [address, setAddress] = useState('');
 
       const addToCart = (item) => {
         setCart(prev => {
@@ -55,49 +58,58 @@
       };
 
       const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const total = subtotal + 15; // est. delivery
+      const total = subtotal + 15;
       const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-      // ✅ Send to Messenger with pre-filled message
-      const openGcashInstructions = () => {
+      // Step 1: After payment, show form
+      const handlePaymentConfirmed = () => {
         if (cart.length === 0) {
           alert("Your cart is empty!");
           return;
         }
+        setShowForm(true);
+        setShowCart(false);
+      };
+
+      // Step 2: Submit form → send to Messenger
+      const submitOrderForm = (e) => {
+        e.preventDefault();
+        if (!name.trim() || !address.trim()) {
+          alert("Please enter your name and address.");
+          return;
+        }
 
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash.
-
-Please confirm!`;
+        const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\n\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
 
         const encodedMessage = encodeURIComponent(message);
         const messengerUrl = `https://m.me/61586479456909?text=${encodedMessage}`;
 
         window.open(messengerUrl, '_blank');
 
-        // Optional: Clear cart after sending (uncomment if desired)
-        // setCart([]);
-        // setShowCart(false);
+        // Optional: Clear cart after sending
+        setCart([]);
+        setName('');
+        setAddress('');
+        setShowForm(false);
       };
 
-      // ✅ Copy order to clipboard (fallback)
       const copyOrderToClipboard = () => {
         if (cart.length === 0) {
           alert("Your cart is empty!");
           return;
         }
-
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const fullMessage = `Hi! I'd like to place an order:\n${itemsText}\nTotal: ₱${total} (incl. delivery)\nI've paid via GCash. Please confirm!\n\nPage: https://www.facebook.com/profile.php?id=61586479456909`;
-
+        const fullMessage = `Hi! I'd like to place an order:\nName: [Your Name]\nAddress: [Your Address]\n\nItems: ${itemsText}\nTotal: ₱${total}\nPaid via GCash.\n\nPage: https://www.facebook.com/profile.php?id=61586479456909`;
         navigator.clipboard.writeText(fullMessage).then(() => {
-          alert('✅ Order copied! Please paste and send it to our Facebook page.');
+          alert('✅ Order template copied! Please fill in your name & address before sending.');
         });
       };
 
       return React.createElement(
         'div',
         { className: 'min-h-screen bg-background text-text font-sans' },
+
         // Header
         React.createElement(
           'header',
@@ -294,7 +306,6 @@ Please confirm!`;
                         React.createElement('span', null, `₱${total}`)
                       )
                     ),
-                    // GCash QR + Action Buttons
                     React.createElement(
                       'div',
                       { className: 'mt-6 text-center' },
@@ -305,28 +316,89 @@ Please confirm!`;
                         className: 'w-32 h-32 mx-auto border rounded-lg bg-white p-1'
                       }),
                       React.createElement('p', { className: 'text-xs text-gray-500 mt-2' }, 'Scan to pay. Include your order in the reference.'),
-
-                      // Primary Button: Send via Messenger
                       React.createElement(
                         'button',
                         {
-                          onClick: openGcashInstructions,
+                          onClick: handlePaymentConfirmed,
                           className: 'w-full mt-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition'
                         },
-                        '✅ I’ve Paid – Send Order via Messenger'
+                        '✅ I’ve Paid – Continue to Send Order'
                       ),
-
-                      // Fallback: Copy Order
                       React.createElement(
                         'button',
                         {
                           onClick: copyOrderToClipboard,
                           className: 'w-full mt-2 py-2 text-gray-600 border border-gray-300 rounded text-sm hover:bg-gray-50 transition'
                         },
-                        '📋 Copy Order & Message Us'
+                        '📋 Copy Order Template'
                       )
                     )
                   )
+            )
+          ),
+
+        // 🆕 Form Modal (after payment)
+        showForm &&
+          React.createElement(
+            React.Fragment,
+            null,
+            React.createElement('div', {
+              className: 'fixed inset-0 bg-black bg-opacity-40 z-50 flex items-end justify-center'
+            }),
+            React.createElement(
+              'div',
+              {
+                className: 'bg-white w-full max-w-md rounded-t-2xl p-6 z-50'
+              },
+              React.createElement('h2', { className: 'text-lg font-semibold text-gray-800 mb-4' }, 'Delivery Details'),
+              React.createElement(
+                'form',
+                {
+                  onSubmit: submitOrderForm,
+                  className: 'space-y-4'
+                },
+                React.createElement(
+                  'div',
+                  null,
+                  React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1' }, 'Full Name'),
+                  React.createElement('input', {
+                    type: 'text',
+                    value: name,
+                    onChange: (e) => setName(e.target.value),
+                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
+                    placeholder: 'Juan Dela Cruz'
+                  })
+                ),
+                React.createElement(
+                  'div',
+                  null,
+                  React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1' }, 'Delivery Address or Landmark'),
+                  React.createElement('textarea', {
+                    value: address,
+                    onChange: (e) => setAddress(e.target.value),
+                    rows: 3,
+                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
+                    placeholder: 'e.g., Brgy. San Isidro, near Jollibee...'
+                  })
+                ),
+                React.createElement(
+                  'button',
+                  {
+                    type: 'submit',
+                    className: 'w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-700 transition'
+                  },
+                  '📤 Send Order via Messenger'
+                ),
+                React.createElement(
+                  'button',
+                  {
+                    type: 'button',
+                    onClick: () => setShowForm(false),
+                    className: 'w-full mt-2 py-2 text-gray-600 rounded text-sm'
+                  },
+                  '← Back to Cart'
+                )
+              )
             )
           ),
 
