@@ -66,11 +66,7 @@
         }
 
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. 
-
-Name:
-
-Address:
+        const message = `Hi! I'd like to place an order:\n\n${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash.
 
 Please confirm!`;
 
