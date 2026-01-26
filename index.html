@@ -36,7 +36,7 @@
     function App() {
       const [cart, setCart] = useState([]);
       const [showCart, setShowCart] = useState(false);
-      const [showForm, setShowForm] = useState(false); // 👈 New state
+      const [showForm, setShowForm] = useState(false);
       const [name, setName] = useState('');
       const [address, setAddress] = useState('');
 
@@ -71,7 +71,7 @@
         setShowCart(false);
       };
 
-      // Step 2: Submit form → send to Messenger
+      // Step 2: Submit form → open FB chat + copy message
       const submitOrderForm = (e) => {
         e.preventDefault();
         if (!name.trim() || !address.trim()) {
@@ -82,10 +82,24 @@
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
         const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\n\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
 
-        const encodedMessage = encodeURIComponent(message);
-        const messengerUrl = `https://m.me/61586479456909?text=${encodedMessage}`;
+        // Open direct Facebook Messages chat
+        const fbChatUrl = "https://www.facebook.com/messages/t/61586479456909";
+        const chatWindow = window.open(fbChatUrl, '_blank');
 
-        window.open(messengerUrl, '_blank');
+        // Copy message to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+          // Focus chat window if possible
+          if (chatWindow) setTimeout(() => chatWindow.focus(), 500);
+          
+          alert(
+            '✅ Order copied!\n\n' +
+            '1. The Facebook chat has opened.\n' +
+            '2. Paste this message (Ctrl+V or long-press → Paste).\n' +
+            '3. Send it to complete your order!'
+          );
+        }).catch(() => {
+          alert('Failed to copy. Please select and copy the message manually.');
+        });
 
         // Optional: Clear cart after sending
         setCart([]);
@@ -94,15 +108,26 @@
         setShowForm(false);
       };
 
-      const copyOrderToClipboard = () => {
+      // Copy template (without name/address)
+      const copyOrderTemplate = () => {
         if (cart.length === 0) {
           alert("Your cart is empty!");
           return;
         }
-        const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const fullMessage = `Hi! I'd like to place an order:\nName: [Your Name]\nAddress: [Your Address]\n\nItems: ${itemsText}\nTotal: ₱${total}\nPaid via GCash.\n\nPage: https://www.facebook.com/profile.php?id=61586479456909`;
-        navigator.clipboard.writeText(fullMessage).then(() => {
-          alert('✅ Order template copied! Please fill in your name & address before sending.');
+        const template = `Hi! I'd like to place an order:
+
+Name: [Your Full Name]
+Address: [Your Complete Address or Landmark]
+
+Items: ${cart.map(item => `${item.name} x${item.quantity}`).join(', ')}
+Total: ₱${total} (incl. delivery)
+
+I've paid via GCash. Please confirm!
+
+Message me here: https://www.facebook.com/profile.php?id=61586479456909`;
+        
+        navigator.clipboard.writeText(template).then(() => {
+          alert('📋 Template copied! Fill in your details and send it to our Facebook page.');
         });
       };
 
@@ -322,12 +347,12 @@
                           onClick: handlePaymentConfirmed,
                           className: 'w-full mt-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition'
                         },
-                        '✅ I’ve Paid – Continue to Send Order'
+                        '✅ I’ve Paid – Send My Order'
                       ),
                       React.createElement(
                         'button',
                         {
-                          onClick: copyOrderToClipboard,
+                          onClick: copyOrderTemplate,
                           className: 'w-full mt-2 py-2 text-gray-600 border border-gray-300 rounded text-sm hover:bg-gray-50 transition'
                         },
                         '📋 Copy Order Template'
@@ -337,7 +362,7 @@
             )
           ),
 
-        // 🆕 Form Modal (after payment)
+        // Delivery Form Modal
         showForm &&
           React.createElement(
             React.Fragment,
@@ -366,7 +391,8 @@
                     value: name,
                     onChange: (e) => setName(e.target.value),
                     className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
-                    placeholder: 'Juan Dela Cruz'
+                    placeholder: 'Juan Dela Cruz',
+                    required: true
                   })
                 ),
                 React.createElement(
@@ -378,7 +404,8 @@
                     onChange: (e) => setAddress(e.target.value),
                     rows: 3,
                     className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
-                    placeholder: 'e.g., Brgy. San Isidro, near Jollibee...'
+                    placeholder: 'e.g., Brgy. San Isidro, near Jollibee...',
+                    required: true
                   })
                 ),
                 React.createElement(
@@ -387,7 +414,7 @@
                     type: 'submit',
                     className: 'w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-700 transition'
                   },
-                  '📤 Send Order via Messenger'
+                  '📤 Send Order via Facebook'
                 ),
                 React.createElement(
                   'button',
