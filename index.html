@@ -61,7 +61,6 @@
       const total = subtotal + 15;
       const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-      // Step 1: After payment, show form
       const handlePaymentConfirmed = () => {
         if (cart.length === 0) {
           alert("Your cart is empty!");
@@ -71,7 +70,6 @@
         setShowCart(false);
       };
 
-      // Step 2: Submit form → open FB chat + copy message
       const submitOrderForm = (e) => {
         e.preventDefault();
         if (!name.trim() || !address.trim()) {
@@ -80,35 +78,32 @@
         }
 
         const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\n\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
+        const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
 
-        // Open direct Facebook Messages chat
-        const fbChatUrl = "https://www.facebook.com/messages/t/61586479456909";
-        const chatWindow = window.open(fbChatUrl, '_blank');
+        // ✅ Open your PUBLIC Facebook profile (most reliable)
+        window.open("https://www.facebook.com/profile.php?id=61586479456909", "_blank");
 
-        // Copy message to clipboard
+        // ✅ Copy full order message
         navigator.clipboard.writeText(message).then(() => {
-          // Focus chat window if possible
-          if (chatWindow) setTimeout(() => chatWindow.focus(), 500);
-          
           alert(
-            '✅ Order copied!\n\n' +
-            '1. The Facebook chat has opened.\n' +
-            '2. Paste this message (Ctrl+V or long-press → Paste).\n' +
-            '3. Send it to complete your order!'
+            "✅ ORDER READY TO SEND!\n\n" +
+            "1. Go to the Facebook tab we just opened\n" +
+            "2. Click the blue 'Message' button\n" +
+            "3. Long-press in the message box → Paste\n" +
+            "4. Tap Send!\n\n" +
+            "We’ll reply as soon as we see it!"
           );
         }).catch(() => {
-          alert('Failed to copy. Please select and copy the message manually.');
+          alert("Failed to copy. Please write your order manually on Facebook.");
         });
 
-        // Optional: Clear cart after sending
+        // Clear everything
         setCart([]);
         setName('');
         setAddress('');
         setShowForm(false);
       };
 
-      // Copy template (without name/address)
       const copyOrderTemplate = () => {
         if (cart.length === 0) {
           alert("Your cart is empty!");
@@ -117,17 +112,17 @@
         const template = `Hi! I'd like to place an order:
 
 Name: [Your Full Name]
-Address: [Your Complete Address or Landmark]
+Address: [Your Complete Address]
 
 Items: ${cart.map(item => `${item.name} x${item.quantity}`).join(', ')}
 Total: ₱${total} (incl. delivery)
 
 I've paid via GCash. Please confirm!
 
-Message me here: https://www.facebook.com/profile.php?id=61586479456909`;
+Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
         
         navigator.clipboard.writeText(template).then(() => {
-          alert('📋 Template copied! Fill in your details and send it to our Facebook page.');
+          alert('📋 Template copied! Fill in your details and send it to us on Facebook.');
         });
       };
 
