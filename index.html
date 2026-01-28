@@ -52,7 +52,7 @@
 <div id="root"></div>
 
 <script type="module">
-  import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+  import React, { useState } from 'https://esm.sh/react@18.3.1';
   import ReactDOM from 'https://esm.sh/react-dom@18.3.1';
 
   const menu = [
@@ -159,7 +159,6 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
       'div',
       { className: 'min-h-screen bg-background pb-24' },
 
-      // ─── Header ────────────────────────────────────────
       React.createElement(
         'header',
         { className: 'sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm' },
@@ -169,21 +168,13 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
           React.createElement('h1', { className: 'text-2xl font-bold text-gray-900 tracking-tight' }, 'POP ’N CRUNCH'),
           React.createElement(
             'button',
-            {
-              onClick: () => setShowCart(true),
-              className: 'relative p-3 rounded-full hover:bg-gray-100 transition active:scale-95'
-            },
+            { onClick: () => setShowCart(true), className: 'relative p-3 rounded-full hover:bg-gray-100 transition active:scale-95' },
             '🛒',
-            itemCount > 0 && React.createElement(
-              'span',
-              { className: 'absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow' },
-              itemCount
-            )
+            itemCount > 0 && React.createElement('span', { className: 'absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow' }, itemCount)
           )
         )
       ),
 
-      // ─── Hero-ish banner ───────────────────────────────
       React.createElement(
         'div',
         { className: 'bg-gradient-to-br from-indigo-50 to-amber-50 py-8 px-4 text-center' },
@@ -191,12 +182,10 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
         React.createElement('p', { className: 'mt-2 text-muted' }, 'Fast delivery • GCash ready • Quezon City')
       ),
 
-      // ─── Menu Sections ─────────────────────────────────
       React.createElement(
         'main',
         { className: 'max-w-4xl mx-auto px-4 py-8 space-y-10' },
 
-        // Fries
         React.createElement(
           'section',
           null,
@@ -208,11 +197,7 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
               React.createElement(
                 'div',
                 { key: item.id, className: 'bg-surface rounded-card shadow-soft overflow-hidden flex items-center p-4 hover:shadow-raised transition-all duration-300 group' },
-                React.createElement('img', {
-                  src: item.img,
-                  alt: item.name,
-                  className: 'w-20 h-20 object-cover rounded-lg food-img group-hover:scale-105'
-                }),
+                React.createElement('img', { src: item.img, alt: item.name, className: 'w-20 h-20 object-cover rounded-lg food-img group-hover:scale-105' }),
                 React.createElement(
                   'div',
                   { className: 'ml-4 flex-1' },
@@ -223,10 +208,7 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
                     React.createElement('span', { className: 'text-xl font-bold text-primary' }, `₱${item.price}`),
                     React.createElement(
                       'button',
-                      {
-                        onClick: () => addToCart(item),
-                        className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm'
-                      },
+                      { onClick: () => addToCart(item), className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm' },
                       'Add'
                     )
                   )
@@ -236,7 +218,6 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
           )
         ),
 
-        // Fruit Soda
         React.createElement(
           'section',
           null,
@@ -248,19 +229,12 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
               React.createElement(
                 'div',
                 { key: item.id, className: 'bg-surface rounded-card shadow-soft p-4 text-center hover:shadow-raised transition-all duration-300 group' },
-                React.createElement('img', {
-                  src: item.img,
-                  alt: item.name,
-                  className: 'w-24 h-24 mx-auto object-contain rounded-lg mb-3 food-img group-hover:scale-105'
-                }),
+                React.createElement('img', { src: item.img, alt: item.name, className: 'w-24 h-24 mx-auto object-contain rounded-lg mb-3 food-img group-hover:scale-105' }),
                 React.createElement('h3', { className: 'font-medium text-gray-800 mb-1' }, item.name.split(' - ')[1]),
                 React.createElement('p', { className: 'text-xl font-bold text-primary mb-3' }, `₱${item.price}`),
                 React.createElement(
                   'button',
-                  {
-                    onClick: () => addToCart(item),
-                    className: 'bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm w-full'
-                  },
+                  { onClick: () => addToCart(item), className: 'bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm w-full' },
                   'Add'
                 )
               )
@@ -268,7 +242,6 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
           )
         ),
 
-        // Add-ons
         React.createElement(
           'section',
           null,
@@ -288,24 +261,16 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
               React.createElement('span', { className: 'text-xl font-bold text-primary' }, '₱10'),
               React.createElement(
                 'button',
-                {
-                  onClick: () => addToCart(menu.find(m => m.id === 6)),
-                  className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95'
-                },
+                { onClick: () => addToCart(menu.find(m => m.id === 6)), className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95' },
                 'Add'
               )
             )
           )
         ),
 
-        React.createElement(
-          'p',
-          { className: 'text-center text-muted text-sm mt-8' },
-          'Delivery fee: ₱10–15 (based on location)'
-        )
+        React.createElement('p', { className: 'text-center text-muted text-sm mt-8' }, 'Delivery fee: ₱10–15 (based on location)')
       ),
 
-      // ─── Floating mini cart bar ───────────────────────────
       itemCount > 0 && React.createElement(
         'div',
         { className: 'fixed bottom-4 left-4 right-4 z-20 max-w-md mx-auto' },
@@ -320,36 +285,24 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
           ),
           React.createElement(
             'button',
-            {
-              onClick: () => setShowCart(true),
-              className: 'bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-md'
-            },
+            { onClick: () => setShowCart(true), className: 'bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-md' },
             'View Cart'
           )
         )
       ),
 
-      // ─── Cart Modal ────────────────────────────────────
       showCart && React.createElement(
         React.Fragment,
         null,
-        React.createElement('div', {
-          className: 'fixed inset-0 bg-black/40 backdrop-blur-sm z-40',
-          onClick: () => setShowCart(false)
-        }),
+        React.createElement('div', { className: 'fixed inset-0 bg-black/40 backdrop-blur-sm z-40', onClick: () => setShowCart(false) }),
         React.createElement(
           'div',
-          {
-            className: `fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto z-50 shadow-2xl cart-modal ${showCart ? 'open' : ''}`
-          },
+          { className: `fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto z-50 shadow-2xl cart-modal ${showCart ? 'open' : ''}` },
           React.createElement(
             'div',
             { className: 'sticky top-0 bg-white z-10 px-6 pt-5 pb-4 border-b flex justify-between items-center' },
             React.createElement('h2', { className: 'text-xl font-bold text-gray-900' }, 'Your Order'),
-            React.createElement('button', {
-              onClick: () => setShowCart(false),
-              className: 'text-3xl text-gray-400 hover:text-gray-600'
-            }, '×')
+            React.createElement('button', { onClick: () => setShowCart(false), className: 'text-3xl text-gray-400 hover:text-gray-600' }, '×')
           ),
           React.createElement(
             'div',
@@ -372,75 +325,33 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
                       React.createElement(
                         'div',
                         { className: 'flex items-center space-x-3' },
-                        React.createElement(
-                          'button',
-                          {
-                            onClick: () => updateQuantity(item.id, -1),
-                            className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200'
-                          },
-                          '−'
-                        ),
+                        React.createElement('button', { onClick: () => updateQuantity(item.id, -1), className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200' }, '−'),
                         React.createElement('span', { className: 'w-10 text-center font-semibold' }, item.quantity),
-                        React.createElement(
-                          'button',
-                          {
-                            onClick: () => updateQuantity(item.id, 1),
-                            className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200'
-                          },
-                          '+'
-                        )
+                        React.createElement('button', { onClick: () => updateQuantity(item.id, 1), className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200' }, '+')
                       )
                     )
                   ),
                   React.createElement(
                     'div',
                     { className: 'mt-6 space-y-3 bg-gray-50 p-5 rounded-2xl' },
-                    React.createElement('div', { className: 'flex justify-between text-muted' },
-                      React.createElement('span', null, 'Subtotal:'),
-                      React.createElement('span', null, `₱${subtotal}`)
-                    ),
-                    React.createElement('div', { className: 'flex justify-between text-muted' },
-                      React.createElement('span', null, 'Delivery:'),
-                      React.createElement('span', null, '₱10–15')
-                    ),
-                    React.createElement('div', { className: 'flex justify-between text-lg font-bold pt-3 border-t border-gray-200' },
-                      React.createElement('span', null, 'Total (est.):'),
-                      React.createElement('span', { className: 'text-primary' }, `₱${total}`)
-                    )
+                    React.createElement('div', { className: 'flex justify-between text-muted' }, React.createElement('span', null, 'Subtotal:'), React.createElement('span', null, `₱${subtotal}`)),
+                    React.createElement('div', { className: 'flex justify-between text-muted' }, React.createElement('span', null, 'Delivery:'), React.createElement('span', null, '₱10–15')),
+                    React.createElement('div', { className: 'flex justify-between text-lg font-bold pt-3 border-t border-gray-200' }, React.createElement('span', null, 'Total (est.):'), React.createElement('span', { className: 'text-primary' }, `₱${total}`))
                   ),
                   React.createElement(
                     'div',
                     { className: 'mt-8 space-y-4' },
                     React.createElement('h3', { className: 'font-semibold text-center text-gray-800' }, 'Pay via GCash'),
-                    React.createElement('img', {
-                      src: 'gcash-qr1012.png',
-                      alt: 'GCash QR Code',
-                      className: 'w-40 h-40 mx-auto border-4 border-white rounded-2xl shadow-md bg-white p-2'
-                    }),
+                    React.createElement('img', { src: 'gcash-qr1012.png', alt: 'GCash QR Code', className: 'w-40 h-40 mx-auto border-4 border-white rounded-2xl shadow-md bg-white p-2' }),
                     React.createElement('p', { className: 'text-center text-sm text-muted' }, 'Scan to pay. Include your order in the reference.'),
-                    React.createElement(
-                      'button',
-                      {
-                        onClick: handlePaymentConfirmed,
-                        className: 'w-full py-4 bg-green-600 text-white rounded-2xl font-semibold text-lg hover:bg-green-700 transition active:scale-[0.98] shadow-md'
-                      },
-                      '✅ I’ve Paid – Send My Order'
-                    ),
-                    React.createElement(
-                      'button',
-                      {
-                        onClick: copyOrderTemplate,
-                        className: 'w-full py-3.5 bg-white border-2 border-gray-300 rounded-2xl font-medium hover:bg-gray-50 transition'
-                      },
-                      '📋 Copy Order Template'
-                    )
+                    React.createElement('button', { onClick: handlePaymentConfirmed, className: 'w-full py-4 bg-green-600 text-white rounded-2xl font-semibold text-lg hover:bg-green-700 transition active:scale-[0.98] shadow-md' }, '✅ I’ve Paid – Send My Order'),
+                    React.createElement('button', { onClick: copyOrderTemplate, className: 'w-full py-3.5 bg-white border-2 border-gray-300 rounded-2xl font-medium hover:bg-gray-50 transition' }, '📋 Copy Order Template')
                   )
                 )
           )
         )
       ),
 
-      // ─── Delivery Form Modal ───────────────────────────
       showForm && React.createElement(
         React.Fragment,
         null,
@@ -456,15 +367,30 @@ Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
               'div',
               null,
               React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1.5' }, 'Full Name'),
-              React.createElement('input', {
-                type: 'text',
-                value: name,
-                onChange: e => setName(e.target.value),
-                className: 'w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none',
-                placeholder: 'Juan Dela Cruz',
-                required: true
-              })
+              React.createElement('input', { type: 'text', value: name, onChange: e => setName(e.target.value), className: 'w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none', placeholder: 'Juan Dela Cruz', required: true })
             ),
             React.createElement(
               'div',
- 
+              null,
+              React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1.5' }, 'Delivery Address or Landmark'),
+              React.createElement('textarea', { value: address, onChange: e => setAddress(e.target.value), rows: 4, className: 'w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none resize-none', placeholder: 'e.g., Brgy. San Isidro, near Jollibee...', required: true })
+            ),
+            React.createElement('button', { type: 'submit', className: 'w-full py-4 bg-primary text-white rounded-2xl font-semibold text-lg hover:bg-primaryDark transition active:scale-[0.98] shadow-md' }, '📤 Send Order via Facebook'),
+            React.createElement('button', { type: 'button', onClick: () => setShowForm(false), className: 'w-full py-3.5 text-gray-600 font-medium hover:bg-gray-50 rounded-2xl transition' }, '← Back to Cart')
+          )
+        )
+      ),
+
+      React.createElement(
+        'footer',
+        { className: 'text-center py-10 text-sm text-muted border-t border-gray-100 mt-12' },
+        `© ${new Date().getFullYear()} pop ’n crunch — fresh snacks, fast delivery. `,
+        React.createElement('a', { href: 'https://www.facebook.com/profile.php?id=61586479456909', target: '_blank', rel: 'noopener noreferrer', className: 'text-primary hover:underline font-medium' }, 'Message us on Facebook')
+      )
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
