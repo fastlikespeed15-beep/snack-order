@@ -1,115 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>POP 'N CRUNCH</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: '#4f46e5',
-            accent: '#f59e0b',
-            background: '#fdf9f3',
-            surface: '#fefefe',
-            text: '#374151'
+            primary:   '#4f46e5',
+            primaryDark:'#4338ca',
+            accent:    '#f59e0b',
+            background:'#fdf9f3',
+            surface:   '#ffffff',
+            text:      '#1f2937',
+            muted:     '#6b7280',
+          },
+          borderRadius: {
+            'card': '1rem',
+          },
+          boxShadow: {
+            'soft': '0 4px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
+            'raised': '0 10px 25px -5px rgba(79,70,229,0.2)',
+          },
+          transitionProperty: {
+            'height': 'height',
+            'spacing': 'margin, padding',
           }
         }
       }
     }
   </script>
-  <script type="module">
-    import React, { useState } from 'https://esm.sh/react@18.2.0';
-    import ReactDOM from 'https://esm.sh/react-dom@18.2.0';
 
-    const menu = [
-      { id: 1, name: 'Regular Fries', price: 35, img: 'regular.jpeg', category: 'fries' },
-      { id: 2, name: 'Large Fries', price: 45, img: 'large.jpeg', category: 'fries' },
-      { id: 3, name: 'Fruit Soda - Strawberry', price: 25, img: 'strawberry.jpeg', category: 'soda' },
-      { id: 4, name: 'Fruit Soda - Blueberry', price: 25, img: 'blueberry.jpeg', category: 'soda' },
-      { id: 5, name: 'Fruit Soda - Green Apple', price: 25, img: 'greenapple.jpeg', category: 'soda' },
-      { id: 6, name: 'Add-on: Nata de Coco', price: 10, img: 'natadecoco.jpeg', category: 'addon' },
-    ];
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    function App() {
-      const [cart, setCart] = useState([]);
-      const [showCart, setShowCart] = useState(false);
-      const [showForm, setShowForm] = useState(false);
-      const [name, setName] = useState('');
-      const [address, setAddress] = useState('');
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .cart-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .cart-modal.open { transform: translateY(0); }
+    img.food-img { transition: transform 0.25s ease; }
+    button:hover img.food-img { transform: scale(1.06); }
+  </style>
+</head>
+<body class="min-h-screen bg-background text-text antialiased">
 
-      const addToCart = (item) => {
-        setCart(prev => {
-          const existing = prev.find(i => i.id === item.id);
-          return existing
-            ? prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
-            : [...prev, { ...item, quantity: 1 }];
-        });
-      };
+<div id="root"></div>
 
-      const updateQuantity = (id, delta) => {
-        setCart(prev =>
-          prev
-            .map(item => item.id === id ? { ...item, quantity: item.quantity + delta } : item)
-            .filter(item => item.quantity > 0)
+<script type="module">
+  import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+  import ReactDOM from 'https://esm.sh/react-dom@18.3.1';
+
+  const menu = [
+    { id: 1, name: 'Regular Fries', price: 35, img: 'regular.jpeg', category: 'fries' },
+    { id: 2, name: 'Large Fries', price: 45, img: 'large.jpeg', category: 'fries' },
+    { id: 3, name: 'Fruit Soda - Strawberry', price: 25, img: 'strawberry.jpeg', category: 'soda' },
+    { id: 4, name: 'Fruit Soda - Blueberry', price: 25, img: 'blueberry.jpeg', category: 'soda' },
+    { id: 5, name: 'Fruit Soda - Green Apple', price: 25, img: 'greenapple.jpeg', category: 'soda' },
+    { id: 6, name: 'Add-on: Nata de Coco', price: 10, img: 'natadecoco.jpeg', category: 'addon' },
+  ];
+
+  function App() {
+    const [cart, setCart] = useState([]);
+    const [showCart, setShowCart] = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+
+    const addToCart = (item) => {
+      setCart(prev => {
+        const existing = prev.find(i => i.id === item.id);
+        if (existing) {
+          return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        }
+        return [...prev, { ...item, quantity: 1 }];
+      });
+    };
+
+    const updateQuantity = (id, delta) => {
+      setCart(prev =>
+        prev
+          .map(item => item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item)
+          .filter(item => item.quantity > 0)
+      );
+    };
+
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = subtotal + 15;
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    const handlePaymentConfirmed = () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      setShowForm(true);
+      setShowCart(false);
+    };
+
+    const submitOrderForm = (e) => {
+      e.preventDefault();
+      if (!name.trim() || !address.trim()) {
+        alert("Please enter your name and address.");
+        return;
+      }
+
+      const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
+      const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
+
+      window.open("https://www.facebook.com/profile.php?id=61586479456909", "_blank");
+
+      navigator.clipboard.writeText(message).then(() => {
+        alert(
+          "✅ ORDER READY TO SEND!\n\n" +
+          "1. Go to the Facebook tab we just opened\n" +
+          "2. Click the blue 'Message' button\n" +
+          "3. Long-press in the message box → Paste\n" +
+          "4. Tap Send!\n\n" +
+          "We’ll reply as soon as we see it!"
         );
-      };
+      }).catch(() => {
+        alert("Failed to copy. Please write your order manually on Facebook.");
+      });
 
-      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const total = subtotal + 15;
-      const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      setCart([]);
+      setName('');
+      setAddress('');
+      setShowForm(false);
+    };
 
-      const handlePaymentConfirmed = () => {
-        if (cart.length === 0) {
-          alert("Your cart is empty!");
-          return;
-        }
-        setShowForm(true);
-        setShowCart(false);
-      };
-
-      const submitOrderForm = (e) => {
-        e.preventDefault();
-        if (!name.trim() || !address.trim()) {
-          alert("Please enter your name and address.");
-          return;
-        }
-
-        const itemsText = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-        const message = `Hi! I'd like to place an order:\n\nName: ${name}\nAddress: ${address}\nItems: ${itemsText}\nTotal: ₱${total} (incl. delivery)\n\nI've paid via GCash. Please confirm!`;
-
-        // ✅ Open your PUBLIC Facebook profile (most reliable)
-        window.open("https://www.facebook.com/profile.php?id=61586479456909", "_blank");
-
-        // ✅ Copy full order message
-        navigator.clipboard.writeText(message).then(() => {
-          alert(
-            "✅ ORDER READY TO SEND!\n\n" +
-            "1. Go to the Facebook tab we just opened\n" +
-            "2. Click the blue 'Message' button\n" +
-            "3. Long-press in the message box → Paste\n" +
-            "4. Tap Send!\n\n" +
-            "We’ll reply as soon as we see it!"
-          );
-        }).catch(() => {
-          alert("Failed to copy. Please write your order manually on Facebook.");
-        });
-
-        // Clear everything
-        setCart([]);
-        setName('');
-        setAddress('');
-        setShowForm(false);
-      };
-
-      const copyOrderTemplate = () => {
-        if (cart.length === 0) {
-          alert("Your cart is empty!");
-          return;
-        }
-        const template = `Hi! I'd like to place an order:
+    const copyOrderTemplate = () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      const template = `Hi! I'd like to place an order:
 
 Name: [Your Full Name]
 Address: [Your Complete Address]
@@ -120,333 +149,322 @@ Total: ₱${total} (incl. delivery)
 I've paid via GCash. Please confirm!
 
 Message us here: https://www.facebook.com/profile.php?id=61586479456909`;
-        
-        navigator.clipboard.writeText(template).then(() => {
-          alert('📋 Template copied! Fill in your details and send it to us on Facebook.');
-        });
-      };
 
-      return React.createElement(
-        'div',
-        { className: 'min-h-screen bg-background text-text font-sans' },
+      navigator.clipboard.writeText(template).then(() => {
+        alert('📋 Template copied! Fill in your details and send it to us on Facebook.');
+      });
+    };
 
-        // Header
+    return React.createElement(
+      'div',
+      { className: 'min-h-screen bg-background pb-24' },
+
+      // ─── Header ────────────────────────────────────────
+      React.createElement(
+        'header',
+        { className: 'sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm' },
         React.createElement(
-          'header',
-          { className: 'bg-white shadow-sm border-b border-gray-100' },
+          'div',
+          { className: 'max-w-4xl mx-auto px-4 py-4 flex items-center justify-between' },
+          React.createElement('h1', { className: 'text-2xl font-bold text-gray-900 tracking-tight' }, 'POP ’N CRUNCH'),
           React.createElement(
-            'div',
-            { className: 'max-w-4xl mx-auto px-4 py-4 flex justify-between items-center' },
-            React.createElement('h1', { className: 'text-xl font-semibold text-gray-800' }, 'pop ’n crunch'),
-            React.createElement(
-              'button',
-              {
-                onClick: () => setShowCart(true),
-                className: 'relative p-2 text-lg text-gray-700 hover:text-primary transition'
-              },
-              '🛒',
-              itemCount > 0 &&
-                React.createElement(
-                  'span',
-                  {
-                    className: 'absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'
-                  },
-                  itemCount
-                )
+            'button',
+            {
+              onClick: () => setShowCart(true),
+              className: 'relative p-3 rounded-full hover:bg-gray-100 transition active:scale-95'
+            },
+            '🛒',
+            itemCount > 0 && React.createElement(
+              'span',
+              { className: 'absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow' },
+              itemCount
             )
           )
-        ),
+        )
+      ),
 
-        // Main Menu
+      // ─── Hero-ish banner ───────────────────────────────
+      React.createElement(
+        'div',
+        { className: 'bg-gradient-to-br from-indigo-50 to-amber-50 py-8 px-4 text-center' },
+        React.createElement('h2', { className: 'text-2xl md:text-3xl font-bold text-gray-800' }, 'Fresh Fries & Fruit Soda'),
+        React.createElement('p', { className: 'mt-2 text-muted' }, 'Fast delivery • GCash ready • Quezon City')
+      ),
+
+      // ─── Menu Sections ─────────────────────────────────
+      React.createElement(
+        'main',
+        { className: 'max-w-4xl mx-auto px-4 py-8 space-y-10' },
+
+        // Fries
         React.createElement(
-          'main',
-          { className: 'max-w-4xl mx-auto px-4 py-8' },
-          // Fries
+          'section',
+          null,
+          React.createElement('h2', { className: 'text-xl font-semibold text-gray-800 mb-5 border-b border-gray-200 pb-2' }, 'FRIES'),
           React.createElement(
-            'section',
-            { className: 'mb-8' },
-            React.createElement('h2', { className: 'text-lg font-medium mb-4 text-gray-700 pb-2 border-b border-gray-200' }, 'FRIES'),
-            React.createElement(
-              'div',
-              { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
-              menu.filter(item => item.category === 'fries').map(item =>
+            'div',
+            { className: 'grid grid-cols-1 sm:grid-cols-2 gap-5' },
+            menu.filter(i => i.category === 'fries').map(item =>
+              React.createElement(
+                'div',
+                { key: item.id, className: 'bg-surface rounded-card shadow-soft overflow-hidden flex items-center p-4 hover:shadow-raised transition-all duration-300 group' },
+                React.createElement('img', {
+                  src: item.img,
+                  alt: item.name,
+                  className: 'w-20 h-20 object-cover rounded-lg food-img group-hover:scale-105'
+                }),
                 React.createElement(
                   'div',
-                  { key: item.id, className: 'flex items-center justify-between bg-surface p-4 rounded-xl shadow-sm border border-gray-100' },
+                  { className: 'ml-4 flex-1' },
+                  React.createElement('h3', { className: 'font-semibold text-gray-800' }, item.name),
                   React.createElement(
                     'div',
-                    { className: 'flex items-center space-x-3' },
-                    React.createElement('img', { src: item.img, alt: item.name, className: 'w-12 h-12 object-contain rounded' }),
-                    React.createElement('span', { className: 'font-medium text-gray-800' }, item.name)
-                  ),
-                  React.createElement(
-                    'div',
-                    { className: 'flex items-center space-x-2' },
-                    React.createElement('span', { className: 'font-bold text-primary' }, `₱${item.price}`),
+                    { className: 'mt-2 flex items-center justify-between' },
+                    React.createElement('span', { className: 'text-xl font-bold text-primary' }, `₱${item.price}`),
                     React.createElement(
                       'button',
                       {
                         onClick: () => addToCart(item),
-                        className: 'ml-2 py-1 px-3 bg-primary text-white rounded text-sm hover:bg-indigo-700 transition'
+                        className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm'
                       },
-                      '+'
+                      'Add'
                     )
                   )
                 )
               )
             )
-          ),
-
-          // Sodas
-          React.createElement(
-            'section',
-            { className: 'mb-8' },
-            React.createElement('h2', { className: 'text-lg font-medium mb-4 text-gray-700 pb-2 border-b border-gray-200' }, 'FRUIT SODA'),
-            React.createElement(
-              'div',
-              { className: 'grid grid-cols-1 sm:grid-cols-3 gap-4' },
-              menu.filter(item => item.category === 'soda').map(item =>
-                React.createElement(
-                  'div',
-                  { key: item.id, className: 'flex flex-col items-center bg-surface p-4 rounded-xl shadow-sm border border-gray-100' },
-                  React.createElement('img', { src: item.img, alt: item.name, className: 'w-16 h-16 object-contain mb-2' }),
-                  React.createElement('span', { className: 'font-medium text-sm text-gray-800' }, item.name.split(' - ')[1]),
-                  React.createElement('span', { className: 'font-bold text-primary mt-1' }, `₱${item.price}`),
-                  React.createElement(
-                    'button',
-                    {
-                      onClick: () => addToCart(item),
-                      className: 'mt-2 py-1 px-3 bg-primary text-white rounded text-sm hover:bg-indigo-700 transition'
-                    },
-                    '+'
-                  )
-                )
-              )
-            )
-          ),
-
-          // Add-ons
-          React.createElement(
-            'section',
-            { className: 'mb-8' },
-            React.createElement('h2', { className: 'text-lg font-medium mb-4 text-gray-700 pb-2 border-b border-gray-200' }, 'ADD-ONS'),
-            React.createElement(
-              'div',
-              { className: 'flex items-center justify-between bg-surface p-4 rounded-xl shadow-sm border border-gray-100' },
-              React.createElement(
-                'div',
-                { className: 'flex items-center space-x-3' },
-                React.createElement('img', { src: 'natadecoco.jpeg', alt: 'Nata de Coco', className: 'w-12 h-12 object-contain rounded' }),
-                React.createElement('span', { className: 'font-medium text-gray-800' }, 'Nata de Coco')
-              ),
-              React.createElement(
-                'div',
-                { className: 'flex items-center space-x-2' },
-                React.createElement('span', { className: 'font-bold text-primary' }, '₱10'),
-                React.createElement(
-                  'button',
-                  {
-                    onClick: () => addToCart(menu.find(m => m.id === 6)),
-                    className: 'ml-2 py-1 px-3 bg-primary text-white rounded text-sm hover:bg-indigo-700 transition'
-                  },
-                  '+'
-                )
-              )
-            )
-          ),
-
-          React.createElement('p', { className: 'text-gray-500 text-center text-sm mt-6' }, 'Delivery fee: ₱10–15 (based on location)')
+          )
         ),
 
-        // Cart Modal
-        showCart &&
+        // Fruit Soda
+        React.createElement(
+          'section',
+          null,
+          React.createElement('h2', { className: 'text-xl font-semibold text-gray-800 mb-5 border-b border-gray-200 pb-2' }, 'FRUIT SODA'),
           React.createElement(
-            React.Fragment,
-            null,
-            React.createElement('div', {
-              className: 'fixed inset-0 bg-black bg-opacity-30 z-40',
-              onClick: () => setShowCart(false)
-            }),
-            React.createElement(
-              'div',
-              {
-                className: 'fixed bottom-0 left-0 right-0 bg-white p-6 rounded-t-2xl max-h-[80vh] overflow-y-auto z-50 shadow-lg'
-              },
+            'div',
+            { className: 'grid grid-cols-2 sm:grid-cols-3 gap-5' },
+            menu.filter(i => i.category === 'soda').map(item =>
               React.createElement(
                 'div',
-                { className: 'flex justify-between items-center mb-4' },
-                React.createElement('h2', { className: 'text-lg font-semibold text-gray-800' }, 'Your Order'),
-                React.createElement('button', { onClick: () => setShowCart(false), className: 'text-xl text-gray-500' }, '×')
-              ),
-              cart.length === 0
-                ? React.createElement('p', { className: 'text-gray-500' }, 'Your cart is empty.')
-                : React.createElement(
-                    'div',
-                    null,
-                    cart.map(item =>
-                      React.createElement(
-                        'div',
-                        { key: item.id, className: 'flex justify-between py-3 border-b border-gray-100' },
-                        React.createElement(
-                          'div',
-                          null,
-                          React.createElement('h4', { className: 'font-medium text-gray-800' }, item.name),
-                          React.createElement('p', { className: 'text-xs text-gray-500 mt-1' }, `₱${item.price} × ${item.quantity}`)
-                        ),
-                        React.createElement(
-                          'div',
-                          { className: 'flex items-center space-x-2' },
-                          React.createElement(
-                            'button',
-                            { onClick: () => updateQuantity(item.id, -1), className: 'w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600' },
-                            '−'
-                          ),
-                          React.createElement('span', { className: 'w-8 text-center font-medium' }, item.quantity),
-                          React.createElement(
-                            'button',
-                            { onClick: () => updateQuantity(item.id, 1), className: 'w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-600' },
-                            '+'
-                          )
-                        )
-                      )
-                    ),
-                    React.createElement(
-                      'div',
-                      { className: 'mt-5 space-y-1 text-sm' },
-                      React.createElement('div', { className: 'flex justify-between text-gray-600' },
-                        React.createElement('span', null, 'Subtotal:'),
-                        React.createElement('span', null, `₱${subtotal}`)
-                      ),
-                      React.createElement('div', { className: 'flex justify-between text-gray-600' },
-                        React.createElement('span', null, 'Delivery:'),
-                        React.createElement('span', null, '₱10–15')
-                      ),
-                      React.createElement('div', { className: 'flex justify-between font-bold text-gray-800 pt-2 border-t border-gray-200' },
-                        React.createElement('span', null, 'Total (est.):'),
-                        React.createElement('span', null, `₱${total}`)
-                      )
-                    ),
-                    React.createElement(
-                      'div',
-                      { className: 'mt-6 text-center' },
-                      React.createElement('h3', { className: 'font-medium text-gray-700 mb-2' }, 'Pay via GCash'),
-                      React.createElement('img', {
-                        src: 'gcash-qr1012.png',
-                        alt: 'GCash QR Code',
-                        className: 'w-32 h-32 mx-auto border rounded-lg bg-white p-1'
-                      }),
-                      React.createElement('p', { className: 'text-xs text-gray-500 mt-2' }, 'Scan to pay. Include your order in the reference.'),
-                      React.createElement(
-                        'button',
-                        {
-                          onClick: handlePaymentConfirmed,
-                          className: 'w-full mt-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition'
-                        },
-                        '✅ I’ve Paid – Send My Order'
-                      ),
-                      React.createElement(
-                        'button',
-                        {
-                          onClick: copyOrderTemplate,
-                          className: 'w-full mt-2 py-2 text-gray-600 border border-gray-300 rounded text-sm hover:bg-gray-50 transition'
-                        },
-                        '📋 Copy Order Template'
-                      )
-                    )
-                  )
-            )
-          ),
-
-        // Delivery Form Modal
-        showForm &&
-          React.createElement(
-            React.Fragment,
-            null,
-            React.createElement('div', {
-              className: 'fixed inset-0 bg-black bg-opacity-40 z-50 flex items-end justify-center'
-            }),
-            React.createElement(
-              'div',
-              {
-                className: 'bg-white w-full max-w-md rounded-t-2xl p-6 z-50'
-              },
-              React.createElement('h2', { className: 'text-lg font-semibold text-gray-800 mb-4' }, 'Delivery Details'),
-              React.createElement(
-                'form',
-                {
-                  onSubmit: submitOrderForm,
-                  className: 'space-y-4'
-                },
-                React.createElement(
-                  'div',
-                  null,
-                  React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1' }, 'Full Name'),
-                  React.createElement('input', {
-                    type: 'text',
-                    value: name,
-                    onChange: (e) => setName(e.target.value),
-                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
-                    placeholder: 'Juan Dela Cruz',
-                    required: true
-                  })
-                ),
-                React.createElement(
-                  'div',
-                  null,
-                  React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1' }, 'Delivery Address or Landmark'),
-                  React.createElement('textarea', {
-                    value: address,
-                    onChange: (e) => setAddress(e.target.value),
-                    rows: 3,
-                    className: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:outline-none',
-                    placeholder: 'e.g., Brgy. San Isidro, near Jollibee...',
-                    required: true
-                  })
-                ),
+                { key: item.id, className: 'bg-surface rounded-card shadow-soft p-4 text-center hover:shadow-raised transition-all duration-300 group' },
+                React.createElement('img', {
+                  src: item.img,
+                  alt: item.name,
+                  className: 'w-24 h-24 mx-auto object-contain rounded-lg mb-3 food-img group-hover:scale-105'
+                }),
+                React.createElement('h3', { className: 'font-medium text-gray-800 mb-1' }, item.name.split(' - ')[1]),
+                React.createElement('p', { className: 'text-xl font-bold text-primary mb-3' }, `₱${item.price}`),
                 React.createElement(
                   'button',
                   {
-                    type: 'submit',
-                    className: 'w-full py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-indigo-700 transition'
+                    onClick: () => addToCart(item),
+                    className: 'bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-sm w-full'
                   },
-                  '📤 Send Order via Facebook'
-                ),
-                React.createElement(
-                  'button',
-                  {
-                    type: 'button',
-                    onClick: () => setShowForm(false),
-                    className: 'w-full mt-2 py-2 text-gray-600 rounded text-sm'
-                  },
-                  '← Back to Cart'
+                  'Add'
                 )
               )
             )
-          ),
+          )
+        ),
 
-        // Footer
+        // Add-ons
         React.createElement(
-          'footer',
-          { className: 'text-center py-6 text-gray-500 text-xs' },
-          `© ${new Date().getFullYear()} pop ’n crunch — fresh snacks, fast delivery. `,
+          'section',
+          null,
+          React.createElement('h2', { className: 'text-xl font-semibold text-gray-800 mb-5 border-b border-gray-200 pb-2' }, 'ADD-ONS'),
           React.createElement(
-            'a',
+            'div',
+            { className: 'bg-surface rounded-card shadow-soft p-5 flex items-center justify-between hover:shadow-raised transition-all' },
+            React.createElement(
+              'div',
+              { className: 'flex items-center space-x-4' },
+              React.createElement('img', { src: 'natadecoco.jpeg', alt: 'Nata de Coco', className: 'w-16 h-16 object-cover rounded-lg' }),
+              React.createElement('span', { className: 'font-semibold text-gray-800' }, 'Nata de Coco')
+            ),
+            React.createElement(
+              'div',
+              { className: 'flex items-center space-x-4' },
+              React.createElement('span', { className: 'text-xl font-bold text-primary' }, '₱10'),
+              React.createElement(
+                'button',
+                {
+                  onClick: () => addToCart(menu.find(m => m.id === 6)),
+                  className: 'bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primaryDark transition active:scale-95'
+                },
+                'Add'
+              )
+            )
+          )
+        ),
+
+        React.createElement(
+          'p',
+          { className: 'text-center text-muted text-sm mt-8' },
+          'Delivery fee: ₱10–15 (based on location)'
+        )
+      ),
+
+      // ─── Floating mini cart bar ───────────────────────────
+      itemCount > 0 && React.createElement(
+        'div',
+        { className: 'fixed bottom-4 left-4 right-4 z-20 max-w-md mx-auto' },
+        React.createElement(
+          'div',
+          { className: 'bg-white rounded-full shadow-raised px-6 py-4 flex items-center justify-between border border-gray-100' },
+          React.createElement(
+            'div',
+            null,
+            React.createElement('p', { className: 'font-semibold text-gray-800' }, `${itemCount} item${itemCount > 1 ? 's' : ''}`),
+            React.createElement('p', { className: 'text-primary font-bold' }, `₱${total}`)
+          ),
+          React.createElement(
+            'button',
             {
-              href: 'https://www.facebook.com/profile.php?id=61586479456909',
-              target: '_blank',
-              rel: 'noopener noreferrer',
-              className: 'text-primary hover:underline ml-1'
+              onClick: () => setShowCart(true),
+              className: 'bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primaryDark transition active:scale-95 shadow-md'
             },
-            'Message us on Facebook'
+            'View Cart'
           )
         )
-      );
-    }
+      ),
 
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
-  </script>
-</head>
-<body class="min-h-screen bg-background">
-  <div id="root"></div>
-</body>
-</html>
+      // ─── Cart Modal ────────────────────────────────────
+      showCart && React.createElement(
+        React.Fragment,
+        null,
+        React.createElement('div', {
+          className: 'fixed inset-0 bg-black/40 backdrop-blur-sm z-40',
+          onClick: () => setShowCart(false)
+        }),
+        React.createElement(
+          'div',
+          {
+            className: `fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto z-50 shadow-2xl cart-modal ${showCart ? 'open' : ''}`
+          },
+          React.createElement(
+            'div',
+            { className: 'sticky top-0 bg-white z-10 px-6 pt-5 pb-4 border-b flex justify-between items-center' },
+            React.createElement('h2', { className: 'text-xl font-bold text-gray-900' }, 'Your Order'),
+            React.createElement('button', {
+              onClick: () => setShowCart(false),
+              className: 'text-3xl text-gray-400 hover:text-gray-600'
+            }, '×')
+          ),
+          React.createElement(
+            'div',
+            { className: 'p-6 space-y-5' },
+            cart.length === 0
+              ? React.createElement('p', { className: 'text-center text-muted py-10' }, 'Your cart is empty.')
+              : React.createElement(
+                  React.Fragment,
+                  null,
+                  cart.map(item =>
+                    React.createElement(
+                      'div',
+                      { key: item.id, className: 'flex items-center justify-between py-4 border-b last:border-0' },
+                      React.createElement(
+                        'div',
+                        { className: 'flex-1' },
+                        React.createElement('h4', { className: 'font-semibold text-gray-800' }, item.name),
+                        React.createElement('p', { className: 'text-sm text-muted' }, `₱${item.price} × ${item.quantity}`)
+                      ),
+                      React.createElement(
+                        'div',
+                        { className: 'flex items-center space-x-3' },
+                        React.createElement(
+                          'button',
+                          {
+                            onClick: () => updateQuantity(item.id, -1),
+                            className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200'
+                          },
+                          '−'
+                        ),
+                        React.createElement('span', { className: 'w-10 text-center font-semibold' }, item.quantity),
+                        React.createElement(
+                          'button',
+                          {
+                            onClick: () => updateQuantity(item.id, 1),
+                            className: 'w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium hover:bg-gray-200'
+                          },
+                          '+'
+                        )
+                      )
+                    )
+                  ),
+                  React.createElement(
+                    'div',
+                    { className: 'mt-6 space-y-3 bg-gray-50 p-5 rounded-2xl' },
+                    React.createElement('div', { className: 'flex justify-between text-muted' },
+                      React.createElement('span', null, 'Subtotal:'),
+                      React.createElement('span', null, `₱${subtotal}`)
+                    ),
+                    React.createElement('div', { className: 'flex justify-between text-muted' },
+                      React.createElement('span', null, 'Delivery:'),
+                      React.createElement('span', null, '₱10–15')
+                    ),
+                    React.createElement('div', { className: 'flex justify-between text-lg font-bold pt-3 border-t border-gray-200' },
+                      React.createElement('span', null, 'Total (est.):'),
+                      React.createElement('span', { className: 'text-primary' }, `₱${total}`)
+                    )
+                  ),
+                  React.createElement(
+                    'div',
+                    { className: 'mt-8 space-y-4' },
+                    React.createElement('h3', { className: 'font-semibold text-center text-gray-800' }, 'Pay via GCash'),
+                    React.createElement('img', {
+                      src: 'gcash-qr1012.png',
+                      alt: 'GCash QR Code',
+                      className: 'w-40 h-40 mx-auto border-4 border-white rounded-2xl shadow-md bg-white p-2'
+                    }),
+                    React.createElement('p', { className: 'text-center text-sm text-muted' }, 'Scan to pay. Include your order in the reference.'),
+                    React.createElement(
+                      'button',
+                      {
+                        onClick: handlePaymentConfirmed,
+                        className: 'w-full py-4 bg-green-600 text-white rounded-2xl font-semibold text-lg hover:bg-green-700 transition active:scale-[0.98] shadow-md'
+                      },
+                      '✅ I’ve Paid – Send My Order'
+                    ),
+                    React.createElement(
+                      'button',
+                      {
+                        onClick: copyOrderTemplate,
+                        className: 'w-full py-3.5 bg-white border-2 border-gray-300 rounded-2xl font-medium hover:bg-gray-50 transition'
+                      },
+                      '📋 Copy Order Template'
+                    )
+                  )
+                )
+          )
+        )
+      ),
+
+      // ─── Delivery Form Modal ───────────────────────────
+      showForm && React.createElement(
+        React.Fragment,
+        null,
+        React.createElement('div', { className: 'fixed inset-0 bg-black/50 z-50 flex items-end' }),
+        React.createElement(
+          'div',
+          { className: 'fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto z-50 shadow-2xl' },
+          React.createElement('h2', { className: 'text-xl font-bold text-gray-900 mb-6' }, 'Delivery Details'),
+          React.createElement(
+            'form',
+            { onSubmit: submitOrderForm, className: 'space-y-6' },
+            React.createElement(
+              'div',
+              null,
+              React.createElement('label', { className: 'block text-sm font-medium text-gray-700 mb-1.5' }, 'Full Name'),
+              React.createElement('input', {
+                type: 'text',
+                value: name,
+                onChange: e => setName(e.target.value),
+                className: 'w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none',
+                placeholder: 'Juan Dela Cruz',
+                required: true
+              })
+            ),
+            React.createElement(
+              'div',
+ 
